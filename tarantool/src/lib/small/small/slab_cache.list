@@ -1,0 +1,17 @@
+
+slab_list_add			(list, slab, member)
+slab_list_del			(list, slab, member)
+slab_list_create		(struct slab_list *list)
+slab_get_with_order		(struct slab_cache *cache, uint8_t order);
+slab_put_with_order		(struct slab_cache *cache, struct slab *slab);
+slab_get_large			(struct slab_cache *slab, size_t size);
+slab_put_large			(struct slab_cache *cache, struct slab *slab);
+slab_get			(struct slab_cache *cache, size_t size);
+slab_put			(struct slab_cache *cache, struct slab *slab);
+slab_from_ptr			(void *ptr, intptr_t slab_mask)
+slab_sizeof			()
+slab_capacity			(struct slab *slab)
+slab_data			(struct slab *slab)
+slab_from_data			(void *data)
+slab_order			(struct slab_cache *cache, size_t size)
+slab_order_size			(struct slab_cache *cache, uint8_t order)
