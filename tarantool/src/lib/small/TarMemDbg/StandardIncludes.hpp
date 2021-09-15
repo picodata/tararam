@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <type_traits>
 #include <climits>
+#include <mutex>
 
 // платформозависимые включения
 #ifdef     _WIN32
@@ -39,10 +40,11 @@ typedef ptrdiff_t ssize_t;
 
 /// third-party включения - таратнул, small и прочее
 
-
+extern "C" {
 #include "../small/rlist.h"
 #include "../small/lf_lifo_struct.h"
 #include "../small/quota_internal.h"
 #include "../small/slab_arena_internal.h"
 #include "../small/slab_cache_internal.h"
 #include "../small/lsregion_internal.h"
+}

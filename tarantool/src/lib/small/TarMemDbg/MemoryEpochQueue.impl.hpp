@@ -70,7 +70,7 @@ ProtectMemoryConstant CalcProtectTypeFor2ndEpoch(
 //# endif // TARMEMDBG_REUSE_EPOCHS
 }
 
-void MemoryEpochQueue::NextEpoch() {      
+void MemoryEpochQueue::NextEpoch() noexcept {      
   if ( !epochs_->IsEmpty() ) {
     Size nepochs = epochs_->GetNumberEpochs();
     Size buffer_size = epochs_->buffer_size;
@@ -116,9 +116,12 @@ void MemoryEpochQueue::NextEpoch() {
 }
 
 MemoryEpochInterface * MemoryEpochQueue::GetCurrentEpoch() {
-  assert( signature_ == kSignature );
+  assert( CheckIfThisIsReallyMemoryEpochQueue() );
   assert( (bool)epochs_ );
-  return epochs_->GetCurrent();   
+  MemoryEpochInterface * ret = epochs_->GetCurrent();
+  assert( (bool)ret );
+  assert( ret->CheckIfThisIsReallyMemoryEpoch() );
+  return ret;
 }
 
 MemoryEpochLsRegion * MemoryEpochQueue::GetLsEpoch( MemoryEpochInterface * val_interface ) {
@@ -143,19 +146,24 @@ MemoryEpochQueue::AllocateQueue() noexcept {
 void MemoryEpochQueue::operator delete( void * to_free ) noexcept {  
   if ( !to_free ) return;
   MemoryEpochQueue * object = (MemoryEpochQueue*)to_free;
-  assert( object->signature_ == kSignature );
+  assert( object->CheckIfThisIsReallyMemoryEpochQueue() );
   DeallocateWithForbiddenPageAtStart( GetHandle( object ), object->allocated_byte_size_ );
 }
 
 MemoryEpochQueue * MemoryEpochQueue::GetSelfByHandle( void * handle ) noexcept {
+  assert( (bool)handle );
   auto * ret = (MemoryEpochQueue *)( reinterpret_cast<Byte *>(handle) + PageSize()() );
-  assert( ret->signature_ == kSignature );
+  assert( ret->CheckIfThisIsReallyMemoryEpochQueue() );
   return ret;
 }
 
 void * MemoryEpochQueue::GetHandle( MemoryEpochQueue * self ) noexcept {
-  assert( self->signature_ == kSignature );
-  return (void *)( reinterpret_cast<Byte *>(self) - self->offset_of_allocated_ );
+  assert( self->CheckIfThisIsReallyMemoryEpochQueue() );
+  return (void *)( reinterpret_cast<Byte *>(self) + self->offset_of_allocated_ ); // offset_of_allocated_ отрицательный, поэтому прибавляем
+}
+
+Size MemoryEpochQueue::GetPositionOrMaxId() noexcept {
+  return epochs_->GetPositionOrMaxId();
 }
 
 } // namespace TARMEMDBG_NAMESPACE

@@ -26,7 +26,7 @@ set_target_properties(${TarDbgMODULE} PROPERTIES
 )
 target_compile_features(${TarDbgMODULE} INTERFACE cxx_std_20)
 
-target_link_libraries(${TarDbgMODULE} stdc)
+target_link_libraries(${TarDbgMODULE} stdc++)
 
 #target_include_directories(LibName
 #        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}

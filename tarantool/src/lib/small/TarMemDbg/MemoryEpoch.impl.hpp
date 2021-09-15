@@ -76,7 +76,7 @@ void LargeMemoryBlock::Deallocate() noexcept {
   Check( page_size );
   DeallocateAligned( address );
 }
-void LargeMemoryBlock::Check( Size page_size ) noexcept {
+void LargeMemoryBlock::Check( [[maybe_unused]] Size page_size ) noexcept {
   assert(   ( (intptr_t)address % page_size ) == 0 );
   assert(   ( allocated_bytesize % page_size ) == 0 );
 }
@@ -178,7 +178,7 @@ void MemoryEpochInterface::ProtectLsRegionSlabs(
 
 void MemoryEpochInterface::ProtectRlistOfLslabs(
     rlist * head, 
-    Size page_size,
+    [[maybe_unused]] Size page_size,
     Size lslab_size,
     ProtectMemoryConstant protect_type ) {
   rlist * ptr = rlist_first( head );

@@ -31,9 +31,9 @@
  * SUCH DAMAGE.
  */
 
-#if defined(__cplusplus)
+#   if defined(__cplusplus)
 extern "C" {
-#endif /* defined(__cplusplus) */
+#   endif /* defined(__cplusplus) */
 
 enum {
 	/* Smallest possible slab size. */
@@ -177,9 +177,12 @@ small_lb(size_t size)
 		__builtin_clzl((unsigned long) size) - 1;
 }
 
+#   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+extern int slab_arena_create(struct slab_arena **arena, struct quota *quota, size_t prealloc, uint32_t slab_size, int flags);
+#   endif
 
-#if defined(__cplusplus)
+#   if defined(__cplusplus)
 } /* extern "C" */
-#endif
+#   endif
 
 #endif /* INCLUDES_TARANTOOL_SMALL_SLAB_ARENA_INTERNAL_H */

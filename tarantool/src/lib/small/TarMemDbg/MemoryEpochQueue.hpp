@@ -45,14 +45,21 @@ class MemoryEpochQueue {
   typedef MemoryEpochQueue This;
 
   static MemoryEpochQueue * Create( Size starting_index );
-  ~MemoryEpochQueue() { DeleteAligned<Storage>( epochs_ ); }
+  ~MemoryEpochQueue() { 
+    signature_ = 0; 
+    DeleteAligned<Storage>( epochs_ ); 
+  }
   void operator delete( void * to_free ) noexcept;
   
-  void NextEpoch();
+  void NextEpoch() noexcept;
+  inline Size GetPositionOrMaxId() noexcept;
   MemoryEpochInterface * GetCurrentEpoch();
+  static MemoryEpochQueue * GetSelfByHandle( void * handle ) noexcept;
   
   slab_arena * GetArena() noexcept { return GetCurrentEpoch()->GetArena(); }
   lsregion * GetLsRegion() noexcept { return GetCurrentEpoch()->GetLsRegion(); }
+  
+  bool CheckIfThisIsReallyMemoryEpochQueue() { return signature_ == kSignature; }
 
  protected:
   DISALLOW_COPY_MOVE_AND_ASSIGN( MemoryEpochQueue )
@@ -60,14 +67,16 @@ class MemoryEpochQueue {
   //friend void * ::operator new( size_t size, const std::nothrow_t & ) noexcept;
   MemoryEpochQueue() {}
 
-  static MemoryEpochQueue * GetSelfByHandle( void * handle ) noexcept;
   static void * GetHandle( MemoryEpochQueue * self ) noexcept;
   static MemoryEpochLsRegion * GetLsEpoch( MemoryEpochInterface * value );
   static MemoryEpochQueue * AllocateQueue() noexcept;
 
  private:
-  static constexpr const uint64_t kSignature = 0xDEADBEEFc0ffee27;
-  const volatile uint64_t signature_ = kSignature;
+  friend int ::slab_arena_create( slab_arena **arena, quota *quota, 
+                               size_t prealloc, uint32_t slab_size, int flags );
+
+  static constexpr const uint64_t kSignature = 0xDEADBEEFc0ffee27;  // мёртвое мясо кофе 27
+  volatile uint64_t signature_ = kSignature;
   Storage * epochs_;
   PtrDiff offset_of_allocated_ = 0;
   Size allocated_byte_size_ = 0;

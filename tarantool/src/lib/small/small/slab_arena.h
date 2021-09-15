@@ -36,4 +36,27 @@
 
 #include "slab_arena_internal.h"
 
+#   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+
+//extern int slab_arena_create(struct slab_arena **arena, struct quota *quota, size_t prealloc, uint32_t slab_size, int flags);
+extern void slab_arena_destroy(struct slab_arena **arena);
+extern void * slab_map(struct slab_arena *arena);
+extern void slab_unmap(struct slab_arena *arena, void *ptr);
+extern void slab_arena_mprotect(struct slab_arena *arena);
+
+#   else  // picodata memory debug
+
+#      ifdef TARMEMDBG_ALLOW_INCLUDE 
+           // если включён этот флаг, значит компилируется TaraRam. А внутри 
+           // TaraRam не может быть неопределён флаг TARARAM
+#          error Unknown error!!!
+#      endif
+/// @remark если что-то из-за макросов работать не будет, замените на static inline обёртку
+#      define slab_arena_create   slab_arena_create_orig
+#      define slab_arena_destroy  slab_arena_destroy_orig
+#      define slab_map            slab_map_orig
+#      define slab_unmap          slab_unmap_orig
+#      define slab_arena_mprotect slab_arena_mprotect_orig
+#   endif // picodata memory debug
+
 #endif /* INCLUDES_TARANTOOL_SMALL_SLAB_ARENA_H */

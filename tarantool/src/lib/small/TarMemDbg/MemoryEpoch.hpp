@@ -43,7 +43,7 @@ class MemoryEpochInterface {
  public:
   typedef std::vector< LargeMemoryBlock > LMBStorage;
 
-  virtual ~MemoryEpochInterface() {}
+  virtual ~MemoryEpochInterface() { signature_ = 0; }
   
   void operator delete( void * ptr ) noexcept;
 
@@ -55,6 +55,7 @@ class MemoryEpochInterface {
   template <typename DerivedTn>  static MemoryEpochInterface * AllocateDerived() noexcept;
   //static slab_arena * GetArenaByHandle( void * handle ) noexcept;
   //static lsregion * GetLsRegionByHandle( void * handle ) noexcept;
+  bool CheckIfThisIsReallyMemoryEpoch() { return signature_ == kSignature; }
 
 
  protected:
@@ -88,6 +89,9 @@ class MemoryEpochInterface {
       ProtectMemoryConstant protect_type );
   static void DeallocateLargeMemoryBlocks( LMBStorage & large_blocks ) noexcept;
 
+ private:
+  static constexpr const uint64_t kSignature = 0xDEADBEEFc0ffee72; // мёртвое мясо кофе 72
+  volatile uint64_t signature_ = kSignature;
   //Size page_size_ = PageSize::kInitialPageSize;
 };
 

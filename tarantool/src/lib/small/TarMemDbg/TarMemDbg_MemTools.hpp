@@ -36,8 +36,8 @@ void ProtectMemoryOrDie(
     Size aligned_byte_size, 
     ProtectMemoryConstant protection ) {
   if ( !aligned_byte_size ) return;
-  bool no_error = 1;
-  Size page_size = PageSize()();
+  [[maybe_unused]] bool no_error = 1;
+  [[maybe_unused]] Size page_size = PageSize()();
   assert(   ( (intptr_t)aligned_start % page_size ) == 0 );
   assert(   ( aligned_byte_size % page_size ) == 0 );
 # if      _WIN32

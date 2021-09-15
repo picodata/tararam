@@ -16,8 +16,15 @@
 #ifndef    TYPES_PROTECT_SIGNATURE_DI85SC8WW844JM
 #define    TYPES_PROTECT_SIGNATURE_DI85SC8WW844JM
 
+
+namespace      TARMEMDBG_NAMESPACE {
+
 typedef size_t Size;
 typedef uint8_t Byte;
 typedef ptrdiff_t PtrDiff;
+typedef std::mutex Mutex;
+typedef std::lock_guard<Mutex> LockGuard;
+
+} // namespace TARMEMDBG_NAMESPACE
 
 #endif  // TYPES_PROTECT_SIGNATURE_DI85SC8WW844JM

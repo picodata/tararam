@@ -33,8 +33,7 @@
 #include "quota.h"
 
 /** Release used memory */
-static inline ssize_t
-quota_release(struct quota *quota, size_t size)
+ssize_t quota_release(struct quota *quota, size_t size)
 {
 	assert(size < QUOTA_MAX);
 	uint32_t size_in_units = (size + (QUOTA_UNIT_SIZE - 1))

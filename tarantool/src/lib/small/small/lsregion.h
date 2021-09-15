@@ -41,4 +41,48 @@
 
 #include "lsregion_internal.h"
 
+#   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+
+//void   lsregion_create(struct lsregion **lsregion, struct slab_arena *arena);
+void * lsregion_aligned_reserve_slow(struct lsregion **lsregion, size_t size, size_t alignment, void **unaligned );
+void * lsregion_aligned_reserve(struct lsregion *lsregion, size_t size, size_t alignment, void **unaligned);
+void * lsregion_reserve(struct lsregion *lsregion, size_t size);
+void * lsregion_alloc(struct lsregion *lsregion, size_t size, int64_t id);
+void * lsregion_aligned_alloc(struct lsregion *lsregion, size_t size, size_t alignment, int64_t id);
+void   lsregion_gc(struct lsregion *lsregion, int64_t min_id);
+void   lsregion_destroy(struct lsregion *lsregion);
+size_t lsregion_used(const struct lsregion *lsregion);
+size_t lsregion_total(const struct lsregion *lsregion);
+
+#   else  // picodata memory debug
+
+#      ifdef TARMEMDBG_ALLOW_INCLUDE 
+           // если включён этот флаг, значит компилируется TaraRam. А внутри 
+           // TaraRam не может быть неопределён флаг TARARAM
+#          error Unknown error!!!
+#      endif
+/// @remark если что-то из-за макросов работать не будет, замените на static inline обёртку
+#      define lsregion_create lsregion_create_orig
+#      define lsregion_aligned_reserve_slow lsregion_aligned_reserve_slow_orig
+#      define lsregion_aligned_reserve lsregion_aligned_reserve_orig
+#      define lsregion_reserve lsregion_reserve_orig
+#      define lsregion_alloc lsregion_alloc_orig
+#      define lsregion_aligned lsregion_aligned_alloc
+#      define lsregion_gc lsregion_gc_orig
+#      define lsregion_destroy lsregion_destroy_orig
+#      define lsregion_used lsregion_used_orig
+#      define lsregion_total lsregion_total_orig
+#   endif // picodata memory debug
+
+static inline void   lsregion_create_orig(struct lsregion *lsregion, struct slab_arena *arena);
+void *               lsregion_aligned_reserve_slow_orig(struct lsregion *lsregion, size_t size, size_t alignment, void **unaligned );
+static inline void * lsregion_aligned_reserve_orig(struct lsregion *lsregion, size_t size, size_t alignment, void **unaligned);
+static inline void * lsregion_reserve_orig(struct lsregion *lsregion, size_t size);
+static inline void * lsregion_alloc_orig(struct lsregion *lsregion, size_t size, int64_t id);
+static inline void * lsregion_aligned_alloc_orig(struct lsregion *lsregion, size_t size, size_t alignment, int64_t id);
+static inline void   lsregion_gc_orig(struct lsregion *lsregion, int64_t min_id);
+static inline void   lsregion_destroy_orig(struct lsregion *lsregion);
+static inline size_t lsregion_used_orig(const struct lsregion *lsregion);
+static inline size_t lsregion_total_orig(const struct lsregion *lsregion);
+
 #endif

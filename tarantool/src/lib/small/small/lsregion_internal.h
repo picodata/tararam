@@ -31,9 +31,9 @@
  * SUCH DAMAGE.
  */
 
-#if defined(__cplusplus)
+#   if defined(__cplusplus)
 extern "C" {
-#endif /* defined(__cplusplus) */
+#   endif /* defined(__cplusplus) */
 
 #define LSLAB_NOT_USED_ID -1
 
@@ -250,7 +250,7 @@ lsregion_alloc_orig(struct lsregion *lsregion, size_t size, int64_t id)
  * by @a alignment.
  */
 static inline void *
-lsregion_aligned_alloc(struct lsregion *lsregion, size_t size, size_t alignment,
+lsregion_aligned_alloc_orig(struct lsregion *lsregion, size_t size, size_t alignment,
 		       int64_t id)
 {
 	void *unaligned;
@@ -335,8 +335,12 @@ lsregion_total_orig(const struct lsregion *lsregion)
 	return lsregion->slabs.stats.total;
 }
 
-#if defined(__cplusplus)
+#   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+void   lsregion_create(struct lsregion **lsregion, struct slab_arena *arena);
+#   endif
+
+#   if defined(__cplusplus)
 } /* extern "C" */
-#endif /* defined(__cplusplus) */
+#   endif /* defined(__cplusplus) */
 
 #endif
