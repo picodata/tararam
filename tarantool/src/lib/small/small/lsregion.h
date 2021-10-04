@@ -53,6 +53,7 @@ void   lsregion_gc(struct lsregion *lsregion, int64_t min_id);
 void   lsregion_destroy(struct lsregion *lsregion);
 size_t lsregion_used(const struct lsregion *lsregion);
 size_t lsregion_total(const struct lsregion *lsregion);
+struct lsregion * get_lsregion( memory_epoch_queue ** lsregion_value );
 
 #   else  // picodata memory debug
 
@@ -72,6 +73,7 @@ size_t lsregion_total(const struct lsregion *lsregion);
 #      define lsregion_destroy lsregion_destroy_orig
 #      define lsregion_used lsregion_used_orig
 #      define lsregion_total lsregion_total_orig
+#      define get_lsregion get_lsregion_orig
 #   endif // picodata memory debug
 
 static inline void   lsregion_create_orig(struct lsregion *lsregion, struct slab_arena *arena);
@@ -84,5 +86,6 @@ static inline void   lsregion_gc_orig(struct lsregion *lsregion, int64_t min_id)
 static inline void   lsregion_destroy_orig(struct lsregion *lsregion);
 static inline size_t lsregion_used_orig(const struct lsregion *lsregion);
 static inline size_t lsregion_total_orig(const struct lsregion *lsregion);
+static inline struct lsregion * get_lsregion( struct lsregion* lsregion_value ) { return lsregion_value; }
 
 #endif

@@ -336,7 +336,7 @@ lsregion_total_orig(const struct lsregion *lsregion)
 }
 
 #   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
-void   lsregion_create(struct lsregion **lsregion, struct slab_arena *arena);
+void   lsregion_create(memory_epoch_queue **lsregion_value, struct slab_arena *arena);
 #   endif
 
 #   if defined(__cplusplus)

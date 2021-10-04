@@ -43,6 +43,10 @@ extern void slab_arena_destroy(struct slab_arena **arena);
 extern void * slab_map(struct slab_arena *arena);
 extern void slab_unmap(struct slab_arena *arena, void *ptr);
 extern void slab_arena_mprotect(struct slab_arena *arena);
+struct slab_arena * get_slab_arena( struct memory_epoch_queue ** arena );
+extern void slab_cache_create(struct slab_cache *cache, struct memory_epoch_queue ** arena);
+size_t get_slab_arena_used( struct memory_epoch_queue **arena );
+struct quota * get_slab_arena_quota(struct memory_epoch_queue **arena);
 
 #   else  // picodata memory debug
 
@@ -52,11 +56,15 @@ extern void slab_arena_mprotect(struct slab_arena *arena);
 #          error Unknown error!!!
 #      endif
 /// @remark если что-то из-за макросов работать не будет, замените на static inline обёртку
-#      define slab_arena_create   slab_arena_create_orig
-#      define slab_arena_destroy  slab_arena_destroy_orig
-#      define slab_map            slab_map_orig
-#      define slab_unmap          slab_unmap_orig
-#      define slab_arena_mprotect slab_arena_mprotect_orig
+#      define slab_arena_create    slab_arena_create_orig
+#      define slab_arena_destroy   slab_arena_destroy_orig
+#      define slab_map             slab_map_orig
+#      define slab_unmap           slab_unmap_orig
+#      define slab_arena_mprotect  slab_arena_mprotect_orig
+#      define slab_cache_create    slab_cache_create_orig
+#      define get_slab_arena_quota get_slab_arena_quota_orig
+static inline struct slab_arena * get_slab_arena( struct slab_arena * arena ) {return arena; }
+static inline size_t get_slab_arena_used(struct slab_arena *arena) {return arena->used;}
 #   endif // picodata memory debug
 
 #endif /* INCLUDES_TARANTOOL_SMALL_SLAB_ARENA_H */

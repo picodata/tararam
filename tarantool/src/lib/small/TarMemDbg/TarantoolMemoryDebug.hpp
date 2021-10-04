@@ -18,6 +18,11 @@
 //#   define TARMEMDBG_DELETE_ALL ///< При включении этого флага вся выделенная память будет удалятся
 #   define TARMEMDBG_DELETE_MAIN_MEMORY ///< без этого флага выделенные блоки памяти удалятся не будут, а выделенная под них память будет запрещена к доступу
 
+/*
+#if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+#else  // picodata memory debug
+#endif // picodata memory debug
+*/
 
 #   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
 #      define TARARAM_ON

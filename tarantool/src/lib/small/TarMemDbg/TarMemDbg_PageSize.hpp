@@ -30,11 +30,45 @@ class PageSize {
   Size GetPageSize();
 
  private:
+  Size & GetInstance() const;
+};
+
+Size & PageSize::GetInstance() const {
+  static Size page_size = 0;
+  return page_size;
+}
+
+Size PageSize::GetPageSize() {
+  Size & page_size = GetInstance();
+  if ( !page_size ) {
+    page_size = kInitialPageSize;
+    Size page_size_local = 0;
+#   ifdef     _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    page_size_local = si.dwPageSize;
+#   else   // _WIN32
+    long ret = sysconf(_SC_PAGESIZE);
+    page_size_local = ( ret > 0 ) ? (Size)ret : 0;
+#   endif  // _WIN32
+    if ( page_size_local ) page_size = page_size_local;
+  }
+  return page_size;
+}
+
+# if 0 //  old version - устаревшая версия
+class PageSize {
+ public:
+  static constexpr const Size kInitialPageSize = TARMEMDBG_PAGESIZE;
+  Size operator()() { return GetPageSize(); }
+  Size GetPageSize();
+
+ private:
   struct Body {
     Size page_size = kInitialPageSize;
     static Body * Create();
   };
-  Body * GetBody();
+  static Body * GetBody();
 };
 
 typename PageSize::Body * PageSize::Body::Create() {
@@ -57,6 +91,7 @@ typename PageSize::Body * PageSize::GetBody() {
 Size PageSize::GetPageSize() {
   return GetBody()->page_size;
 }
+#endif
 
 } // namespace TARMEMDBG_NAMESPACE
 

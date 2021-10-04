@@ -110,7 +110,7 @@ class MemoryEpochLsRegion : public MemoryEpochInterface {
 
   virtual slab_arena * GetArena_() override { return arena_; }
   virtual lsregion * GetLsRegion_() override { return lsregion_; }
-  virtual void * AllocateLargeMemoryBlock_( Size byte_size ) override;
+  virtual void * AllocateLargeMemoryBlock_( [[maybe_unused]] Size byte_size ) override { assert(false); return nullptr; }
   void operator delete( void * ptr ) noexcept;
   virtual void ProtectEpoch_( ProtectMemoryConstant protect_type ) override;
 

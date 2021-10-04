@@ -57,6 +57,7 @@ enum {
 #define SLAB_ARENA_FLAG(x)	((x) | SLAB_ARENA_FLAG_MARK)
 #define IS_SLAB_ARENA_FLAG(f,x)	(((f) & (x)) == (x))
 
+struct memory_epoch_queue;
 enum {
 	/* mmap() flags */
 	SLAB_ARENA_PRIVATE	= SLAB_ARENA_FLAG(1 << 0),
@@ -177,9 +178,14 @@ small_lb(size_t size)
 		__builtin_clzl((unsigned long) size) - 1;
 }
 
+static inline struct quota * get_slab_arena_quota_orig( struct slab_arena * arena ) { 
+	return arena->quota; 
+}
+
 #   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
-extern int slab_arena_create(struct slab_arena **arena, struct quota *quota, size_t prealloc, uint32_t slab_size, int flags);
-#   endif
+struct memory_epoch_queue;
+extern int slab_arena_create(struct memory_epoch_queue **arena, struct quota *quota, size_t prealloc, uint32_t slab_size, int flags);
+#   endif // picodata memory debug
 
 #   if defined(__cplusplus)
 } /* extern "C" */

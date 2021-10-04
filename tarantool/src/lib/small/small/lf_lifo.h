@@ -36,12 +36,23 @@
 #include <stdlib.h>
 #include <pmatomic.h>
 
-#include "lf_lifo_struct.h"
-
 #if defined(__cplusplus)
 extern "C" {
 #endif /* defined(__cplusplus) */
 
+/**
+ * A very primitive implementation of lock-free
+ * LIFO (last in first out, AKA stack, AKA single-linked
+ * list with head-only add and remove).
+ *
+ * It is only usable to store free pages of a memory allocator
+ * or similar, since it assumes that all addresses are aligned,
+ * and lower 16 bits of address can be used as a counter-based
+ * solution for ABA problem.
+ */
+struct lf_lifo {
+	void *next;
+};
 
 static inline unsigned short
 aba_value(void *a)

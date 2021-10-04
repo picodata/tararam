@@ -35,6 +35,7 @@
 extern "C" {
 #endif /* defined(__cplusplus) */
 
+struct slab_cache;
 extern const uint32_t slab_magic;
 
 struct slab {
@@ -111,6 +112,9 @@ slab_list_create(struct slab_list *list)
 	rlist_create(&list->slabs);
 	small_stats_reset(&list->stats);
 }
+void
+slab_cache_create_orig(struct slab_cache *cache, struct slab_arena *arena);
+
 
 #if defined(__cplusplus)
 } /* extern "C" */

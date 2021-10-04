@@ -22,7 +22,7 @@ class SlidingWindowEpochOnDelete : public SlidingWindowOnDeleteInterface<TypeTn>
  public:
   typedef TypeTn Type;
 
-  virtual void OnDelete( Type & before_delete_value );
+  virtual void OnDelete( Type & before_delete_value ) { delete before_delete_value; }
 };
 
 //template <typename TypeTn, Size BufferSizeTn> class 
@@ -55,6 +55,7 @@ class MemoryEpochQueue {
   inline Size GetPositionOrMaxId() noexcept;
   MemoryEpochInterface * GetCurrentEpoch();
   static MemoryEpochQueue * GetSelfByHandle( void * handle ) noexcept;
+  static MemoryEpochQueue * GetSelfByHandleNoChecks( void * handle ) noexcept;
   
   slab_arena * GetArena() noexcept { return GetCurrentEpoch()->GetArena(); }
   lsregion * GetLsRegion() noexcept { return GetCurrentEpoch()->GetLsRegion(); }
@@ -72,7 +73,7 @@ class MemoryEpochQueue {
   static MemoryEpochQueue * AllocateQueue() noexcept;
 
  private:
-  friend int ::slab_arena_create( slab_arena **arena, quota *quota, 
+  friend int ::slab_arena_create( memory_epoch_queue **arena, quota *quota, 
                                size_t prealloc, uint32_t slab_size, int flags );
 
   static constexpr const uint64_t kSignature = 0xDEADBEEFc0ffee27;  // мёртвое мясо кофе 27

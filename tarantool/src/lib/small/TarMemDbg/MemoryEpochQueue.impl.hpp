@@ -150,9 +150,13 @@ void MemoryEpochQueue::operator delete( void * to_free ) noexcept {
   DeallocateWithForbiddenPageAtStart( GetHandle( object ), object->allocated_byte_size_ );
 }
 
+MemoryEpochQueue * MemoryEpochQueue::GetSelfByHandleNoChecks( void * handle ) noexcept {
+  return (MemoryEpochQueue *)( reinterpret_cast<Byte *>(handle) + PageSize()() );
+}
+
 MemoryEpochQueue * MemoryEpochQueue::GetSelfByHandle( void * handle ) noexcept {
   assert( (bool)handle );
-  auto * ret = (MemoryEpochQueue *)( reinterpret_cast<Byte *>(handle) + PageSize()() );
+  auto * ret = GetSelfByHandleNoChecks( handle );
   assert( ret->CheckIfThisIsReallyMemoryEpochQueue() );
   return ret;
 }

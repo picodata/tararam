@@ -44,7 +44,6 @@
 extern "C" {
 #endif /* defined(__cplusplus) */
 
-                
 
 /*
  * A binary logarithmic distance between the smallest and
@@ -95,9 +94,6 @@ struct slab_cache {
 	pthread_t thread_id;
 #endif
 };
-
-void
-slab_cache_create(struct slab_cache *cache, struct slab_arena *arena);
 
 void
 slab_cache_destroy(struct slab_cache *cache);
@@ -238,6 +234,20 @@ slab_cache_set_thread(struct slab_cache *cache)
 	cache->thread_id = pthread_self();
 #endif
 }
+
+#   if defined(TARMEMDBG) || defined(TARANTOOL_PICO_MEMORY_DEBUG_ON) || defined(TARARAM) // picodata memory debug
+extern void slab_cache_create(struct slab_cache *cache, struct memory_epoch_queue ** arena)
+#   else  // picodata memory debug
+#      ifdef TARMEMDBG_ALLOW_INCLUDE 
+           // если включён этот флаг, значит компилируется TaraRam. А внутри 
+           // TaraRam не может быть неопределён флаг TARARAM
+#          error Unknown error!!!
+#      endif
+/// @remark если что-то из-за макросов работать не будет, замените на static inline обёртку
+#      define slab_cache_create slab_cache_create_orig
+#   endif // picodata memory debug
+
+
 
 #if defined(__cplusplus)
 } /* extern "C" */

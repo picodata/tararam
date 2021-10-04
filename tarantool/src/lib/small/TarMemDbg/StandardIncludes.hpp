@@ -23,6 +23,7 @@
 #include <type_traits>
 #include <climits>
 #include <mutex>
+#include <map>
 
 // платформозависимые включения
 #ifdef     _WIN32

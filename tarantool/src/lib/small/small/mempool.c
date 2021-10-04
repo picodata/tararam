@@ -35,32 +35,6 @@
 #include <valgrind/memcheck.h>
 
 #include "slab_cache.h"
-//#include "../../say.h"
-
-/** Log levels */
-/*
-enum say_level {
-	S_FATAL,		
-	S_SYSERROR,
-	S_ERROR,
-	S_CRIT,
-	S_WARN,
-	S_INFO,
-	S_VERBOSE,
-	S_DEBUG
-};
-
-typedef void (*sayfunc_t)(int, const char *, int, const char *,
-		    const char *, ...);
-CFORMAT(printf, 5, 0) extern sayfunc_t _say;
-#define say_file_line(level, file, line, error, format, ...) ({ \
-	_say(level, file, line, error, format, ##__VA_ARGS__); })
-#define say(level, error, format, ...) ({ \
-	say_file_line(level, __FILE__, __LINE__, error, format, ##__VA_ARGS__); })
-#define say_info(format, ...) say(S_INFO, NULL, format, ##__VA_ARGS__)
-*/
-//#define my_say_info printf
-#define my_say_info(...)
 
 /* slab fragmentation must reach 1/8 before it's recycled */
 enum { MAX_COLD_FRACTION_LB = 3 };
@@ -200,66 +174,35 @@ mempool_destroy(struct mempool *pool)
 		slab_put_with_order(pool->cache, slab);
 }
 
-
-struct vy_lsm_env;
-extern struct vy_lsm_env * g_vy_lsm_env;
-extern void * g_vy_lsm_env_protected_area;
-extern void * g_pgen_addr;
-extern void * g_pgenptr_in_env;                
-extern size_t g_size_env;                     
-
 void *
 mempool_alloc(struct mempool *pool)
 {
-        //int stack_adr = 0;
-        my_say_info("\nmemcheckkk mepool 00"); 
 	struct mslab *slab = pool->first_hot_slab;
-        my_say_info("\nmemcheckkk mepool 01"); 
 	if (slab == NULL) {
-        my_say_info("\nmemcheckkk mepool 02"); 
 		if (pool->spare) {
-                        my_say_info("\nmemcheckkk mepool 03"); 
-			slab = pool->spare;                       
-                        my_say_info("\nmemcheckkk mepool 04"); 
+			slab = pool->spare;
 			pool->spare = NULL;
 
 		} else if ((slab = (struct mslab *)
 			    slab_get_with_order(pool->cache,
 						pool->slab_order))) {
-                        my_say_info("(env_p_gen = %p) pgen_ptr_in_env=%p envsize=%d protected = %p up_protected=%p",  g_pgen_addr, g_pgenptr_in_env, g_size_env, g_vy_lsm_env_protected_area,
-                                     g_vy_lsm_env_protected_area+4095 );
-                        my_say_info("\nmemcheckkk mepool 05 slab=%p pool=%p stack=%p", slab, pool, (&stack_adr-1) ); 
 			mslab_create(slab, pool);
-                        my_say_info("\nmemcheckkk mepool 06"); 
-			slab_list_add(&pool->slabs, &slab->slab, next_in_list);    
-                        my_say_info("\nmemcheckkk mepool 07"); 
+			slab_list_add(&pool->slabs, &slab->slab, next_in_list);
 		} else if (! rlist_empty(&pool->cold_slabs)) {
-                        my_say_info("\nmemcheckkk mepool 08"); 
 			slab = rlist_shift_entry(&pool->cold_slabs, struct mslab,
 						 next_in_cold);
-                        my_say_info("\nmemcheckkk mepool 09"); 
 		} else {
 			return NULL;
 		}
-                my_say_info("\nmemcheckkk mepool 10"); 
 		assert(slab->in_hot_slabs == false);
-                my_say_info("\nmemcheckkk mepool 11"); 
 		mslab_tree_insert(&pool->hot_slabs, slab);
-                my_say_info("\nmemcheckkk mepool 12"); 
 		slab->in_hot_slabs = true;
-                my_say_info("\nmemcheckkk mepool 13"); 
 		pool->first_hot_slab = slab;
-                my_say_info("\nmemcheckkk mepool 14"); 
 	}
-        my_say_info("\nmemcheckkk mepool 15"); 
 	pool->slabs.stats.used += pool->objsize;
-        my_say_info("\nmemcheckkk mepool 16"); 
 	void *ptr = mslab_alloc(pool, slab);
-        my_say_info("\nmemcheckkk mepool 17");
 	assert(ptr != NULL);
-        my_say_info("\nmemcheckkk mepool 18"); 
 	VALGRIND_MALLOCLIKE_BLOCK(ptr, pool->objsize, 0, 0);
-        my_say_info("\nmemcheckkk mepool 19"); 
 	return ptr;
 }
 
